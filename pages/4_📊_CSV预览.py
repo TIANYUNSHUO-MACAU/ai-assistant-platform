@@ -4,7 +4,7 @@ import pandas as pd
 
 st.set_page_config(page_title="CSV 预览", page_icon="📊")
 st.title("📊 CSV 预览")
-st.caption("上传一个 CSV 表格，自动展示内容与基础统计。完全本地运行，无需联网。")
+st.caption("上传一个 CSV 表格，自动展示内容、统计与图表。完全本地运行，无需联网。")
 
 uploaded = st.file_uploader("选择 CSV 文件", type=["csv"])
 
@@ -40,6 +40,17 @@ if uploaded is not None:
         if not num_df.empty:
             st.markdown("### 数值列统计")
             st.dataframe(num_df.describe().T, use_container_width=True)
+
+            st.markdown("### 快速图表")
+            col = st.selectbox("选择一个数值列绘图", list(num_df.columns))
+            kind = st.radio("图表类型", ["柱状图", "折线图"], horizontal=True)
+            data = num_df[col].head(50)
+            if kind == "柱状图":
+                st.bar_chart(data)
+            else:
+                st.line_chart(data)
+        else:
+            st.info("没有检测到数值列，跳过图表。")
     except Exception as e:
         st.error(f"读取失败：{e}")
 else:
