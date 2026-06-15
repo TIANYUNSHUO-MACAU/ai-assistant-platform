@@ -3,12 +3,11 @@ import streamlit as st
 import llm_client
 import prompts
 import ui
+import theme
 
-st.set_page_config(page_title="周报生成器", page_icon="🗓️")
+theme.apply()
 force_mock = ui.safety_toggle()
-
-st.title("🗓️ 周报生成器")
-st.caption("把零散的工作记录，整理成条理清晰的周报")
+theme.page_header("周报生成器", "把零散的工作记录，整理成条理清晰的周报")
 
 EXAMPLE = (
     "周一装环境，建了仓库\n"
@@ -17,7 +16,7 @@ EXAMPLE = (
     "周四合并到主页面，写了 README\n"
     "还差测试清单没写完"
 )
-if st.button("📝 填入示例"):
+if st.button("填入示例"):
     st.session_state["weekly_input"] = EXAMPLE
 
 raw = st.text_area(
@@ -33,13 +32,13 @@ if st.button("生成周报", type="primary"):
     if not raw.strip():
         st.warning("请先写几条本周做的事。")
     else:
-        st.markdown("### 周报")
+        st.markdown("##### 周报")
         result = st.write_stream(
             llm_client.chat_stream(prompts.WEEKLY_REPORT, raw,
                                    temperature=0.5, force_mock=force_mock)
         )
         ui.status_badge(llm_client.is_real_mode() and not force_mock)
-        st.download_button("⬇️ 下载周报", result, file_name="周报.txt")
+        st.download_button("下载周报", result, file_name="周报.txt")
         ui.push_history("weekly", raw, result)
 
 ui.show_history("weekly")

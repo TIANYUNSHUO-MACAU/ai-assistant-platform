@@ -1,18 +1,18 @@
-"""项目说明页：把框架选型、分工、验收清单做进网页，验收时一页讲完。"""
+"""项目说明：框架选型 / 分工 / 验收一页讲清"""
 import streamlit as st
+import theme
 
-st.set_page_config(page_title="项目说明", page_icon="📋")
-st.title("📋 项目说明")
-st.caption("一个页面讲清楚：做什么、为什么这么选、怎么验收")
+theme.apply()
+theme.page_header("项目说明", "一个页面讲清楚：做什么、为什么这么选、怎么验收")
 
 tab1, tab2, tab3 = st.tabs(["框架选型", "团队分工", "验收清单"])
 
 with tab1:
     st.markdown("""
-### 为什么选 Streamlit
+##### 为什么选 Streamlit
 | 框架 | 优点 | 是否适合本组 |
 |------|------|------|
-| **Streamlit** | 纯 Python 写页面，零前端基础也能上手，最快成型 | ✅ 选定 |
+| **Streamlit** | 纯 Python 写页面，零前端基础也能上手，最快成型 | 选定 |
 | Gradio | 适合模型输入输出演示 | 备选 |
 | Flask/FastAPI | 更工程化，但开发量大 | 否 |
 | React/Vue | 能力强但门槛高，一周难跑通 | 否 |
@@ -23,7 +23,7 @@ with tab1:
 
 with tab2:
     st.markdown("""
-### 角色分工（PPT 第 9 页）
+##### 角色分工（PPT 第 9 页）
 - **PM（固定）**：拉齐分工、维护任务板、组织 Review 和演示
 - **页面与集成**：搭 Web 入口和菜单，把工具拼到一起
 - **功能开发**：各负责一个 AI 小工具，定义输入输出
@@ -35,7 +35,7 @@ with tab2:
 
 with tab3:
     st.markdown("""
-### 验收门槛（PPT 第 12 页）
+##### 验收门槛（PPT 第 12 页）
 **基础线（必须）**
 - 仓库链接可访问
 - Demo 本地能运行

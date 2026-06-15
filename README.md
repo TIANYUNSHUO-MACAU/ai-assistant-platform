@@ -47,14 +47,21 @@ streamlit run app.py
 
 ```
 .
-├── app.py              # 主入口页面
-├── llm_client.py       # LLM 客户端（真实/模拟双模式）
+├── app.py              # 应用入口（st.navigation 导航 + 单色线性图标）
+├── theme.py            # 全局深蓝商务主题（注入 CSS）
+├── llm_client.py       # LLM 客户端（真实/模拟双模式 + 流式）
+├── ui.py               # 共用组件（安全模式开关/状态/历史/提示词）
 ├── prompts.py          # 提示词集合（可复用）
-├── pages/              # 各工具页面（Streamlit 自动识别）
-│   ├── 1_✍️_文案生成.py
-│   ├── 2_🌐_翻译助手.py
-│   ├── 3_📄_简历优化.py
-│   └── 4_📊_CSV预览.py
+├── views/              # 各页面
+│   ├── home.py         # 首页（工具卡片）
+│   ├── about.py        # 项目说明（选型/分工/验收）
+│   ├── copywriting.py  # 文案生成
+│   ├── translate.py    # 翻译助手
+│   ├── resume.py       # 简历优化
+│   ├── pdf_summary.py  # PDF 摘要
+│   ├── weekly_report.py# 周报生成器
+│   └── csv_preview.py  # CSV 预览（纯本地）
+├── .streamlit/config.toml  # 主题配置
 ├── requirements.txt
 ├── .env.example        # 配置模板
 ├── 框架选型说明.md
