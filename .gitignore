@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# 环境密钥（重要：不要提交真实 key）
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# 操作系统
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
