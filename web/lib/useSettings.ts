@@ -10,7 +10,11 @@ export type Settings = {
   providerId: string;
   model: string;
   keys: Record<string, string>; // providerId -> apiKey
+  models: Record<string, string>; // providerId -> 选中/自定义的模型名
   dark: boolean;
+  // 「自定义」提供商专用
+  customBaseURL: string;
+  customSdk: "openai" | "anthropic";
 };
 
 const STORAGE_KEY = "ai-assistant-settings";
@@ -19,7 +23,10 @@ const DEFAULTS: Settings = {
   providerId: DEFAULT_PROVIDER,
   model: "",
   keys: {},
+  models: {},
   dark: false,
+  customBaseURL: "",
+  customSdk: "openai",
 };
 
 export function useSettings() {
@@ -50,7 +57,13 @@ export function useSettings() {
     setSettings((s) => ({ ...s, keys: { ...s.keys, [providerId]: key } }));
   }, []);
 
-  const currentKey = settings.keys[settings.providerId] || "";
+  // 每个 provider 记住各自选中的模型
+  const setModel = useCallback((providerId: string, model: string) => {
+    setSettings((s) => ({ ...s, models: { ...s.models, [providerId]: model } }));
+  }, []);
 
-  return { settings, update, setKey, currentKey, loaded };
+  const currentKey = settings.keys[settings.providerId] || "";
+  const currentModel = settings.models[settings.providerId] || "";
+
+  return { settings, update, setKey, setModel, currentKey, currentModel, loaded };
 }

@@ -13,7 +13,7 @@ import { MessageBubble } from "@/components/MessageBubble";
 import { FileBar } from "@/components/FileBar";
 
 export default function Home() {
-  const { settings, update, setKey, currentKey, loaded } = useSettings();
+  const { settings, update, setKey, setModel, currentKey, currentModel, loaded } = useSettings();
   const sess = useSessions();
   const [showSettings, setShowSettings] = useState(false);
   const [fileCtx, setFileCtx] = useState("");
@@ -23,6 +23,9 @@ export default function Home() {
   // 当前会话的模式（无会话时用通用对话）
   const modeId = sess.active?.modeId ?? "chat";
   const mode = getMode(modeId);
+
+  // 解析当前生效的模型名：用户选/填的优先，否则取该 provider 第一个预置
+  const resolvedModel = currentModel || PROVIDERS[settings.providerId]?.models[0] || "";
 
   // PDF/CSV 模式：把文件内容拼进 system，让模型基于文档回答
   const systemWithFile = fileCtx
@@ -37,8 +40,10 @@ export default function Home() {
     body: {
       system: systemWithFile,
       providerId: settings.providerId,
-      model: settings.model || PROVIDERS[settings.providerId]?.models[0] || "",
+      model: resolvedModel,
       apiKey: currentKey,
+      customBaseURL: settings.customBaseURL,
+      customSdk: settings.customSdk,
     },
     onFinish: (msg) => {
       // 对话结束：把消息存回会话，并自动命名
@@ -116,7 +121,7 @@ export default function Home() {
           <span className="font-medium">{mode.label}</span>
           {hasKey ? (
             <span className="text-xs text-muted">
-              {PROVIDERS[settings.providerId]?.label} · {settings.model || PROVIDERS[settings.providerId]?.models[0]}
+              {PROVIDERS[settings.providerId]?.label} · {resolvedModel || "未设模型"}
             </span>
           ) : (
             <button
@@ -192,6 +197,7 @@ export default function Home() {
           settings={settings}
           update={update}
           setKey={setKey}
+          setModel={setModel}
           onClose={() => setShowSettings(false)}
         />
       )}
