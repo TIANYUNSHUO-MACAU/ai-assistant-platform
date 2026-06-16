@@ -3,7 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { PROVIDERS } from "@/lib/providers";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 // 接收前端消息 + BYOK 配置，按 provider 路由后流式返回。
 // API Key 来自请求头（前端 localStorage），服务端不持久化。
@@ -23,7 +23,10 @@ export async function POST(req: Request) {
   try {
     let modelInstance;
     if (cfg.sdk === "anthropic") {
-      const anthropic = createAnthropic({ apiKey });
+      const anthropic = createAnthropic({
+        apiKey,
+        ...(cfg.baseURL ? { baseURL: cfg.baseURL } : {}),
+      });
       modelInstance = anthropic(modelId);
     } else {
       const openai = createOpenAI({ apiKey, baseURL: cfg.baseURL });

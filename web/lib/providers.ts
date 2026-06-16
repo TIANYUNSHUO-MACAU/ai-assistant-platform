@@ -12,8 +12,8 @@ export type Provider = {
 export const PROVIDERS: Record<string, Provider> = {
   zhipu: {
     label: "智谱 GLM",
-    sdk: "openai",
-    baseURL: "https://open.bigmodel.cn/api/paas/v4",
+    sdk: "anthropic",
+    baseURL: "https://open.bigmodel.cn/api/anthropic/v1",
     models: ["glm-4.6", "glm-4.5", "glm-4-plus", "glm-4-flash"],
     keyURL: "https://open.bigmodel.cn/usercenter/apikeys",
   },

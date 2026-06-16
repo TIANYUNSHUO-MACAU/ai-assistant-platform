@@ -16,8 +16,9 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const mode = getMode(modeId);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasKey = !!currentKey;
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput, error } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput, append, error } =
     useChat({
       api: "/api/chat",
       body: {
@@ -38,11 +39,25 @@ export default function Home() {
     setMessages([]);
   }
 
+  // 点示例：直接发送（没 key 则先打开设置）
   function submitExample(text: string) {
-    setInput(text);
+    if (!hasKey) {
+      setShowSettings(true);
+      return;
+    }
+    append({ role: "user", content: text });
   }
 
-  const hasKey = !!currentKey;
+  // 表单提交：没 key 拦截并打开设置
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!input.trim()) return;
+    if (!hasKey) {
+      setShowSettings(true);
+      return;
+    }
+    handleSubmit(e);
+  }
 
   return (
     <div className="flex h-screen">
@@ -78,9 +93,18 @@ export default function Home() {
       <main className="flex-1 flex flex-col">
         <header className="h-14 shrink-0 border-b border-border flex items-center justify-between px-5">
           <span className="font-medium">{mode.label}</span>
-          <span className="text-xs text-muted">
-            {hasKey ? `${settings.providerId} · ${settings.model || "默认模型"}` : "未配置 Key"}
-          </span>
+          {hasKey ? (
+            <span className="text-xs text-muted">
+              {PROVIDERS[settings.providerId]?.label} · {settings.model || PROVIDERS[settings.providerId]?.models[0]}
+            </span>
+          ) : (
+            <button
+              onClick={() => setShowSettings(true)}
+              className="text-xs rounded-full bg-accent/10 text-accent px-3 py-1 font-medium hover:bg-accent/20"
+            >
+              未配置 API Key · 点此设置
+            </button>
+          )}
         </header>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto">
@@ -113,7 +137,7 @@ export default function Home() {
         {/* 输入区 */}
         <div className="shrink-0 px-4 pb-5 pt-2">
           <form
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
             className="mx-auto max-w-chat flex items-end gap-2 rounded-2xl border border-border bg-surface p-2 shadow-sm focus-within:border-accent"
           >
             <textarea
@@ -122,7 +146,7 @@ export default function Home() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  if (input.trim() && hasKey) handleSubmit(e as any);
+                  onSubmit(e as any);
                 }
               }}
               rows={1}
@@ -131,7 +155,8 @@ export default function Home() {
             />
             <button
               type="submit"
-              disabled={!input.trim() || isLoading || !hasKey}
+              disabled={isLoading}
+              title={hasKey ? "发送" : "去设置 API Key"}
               className="rounded-xl bg-accent text-accent-fg p-2 disabled:opacity-40 transition-opacity"
             >
               <Icons.ArrowUp size={18} />
