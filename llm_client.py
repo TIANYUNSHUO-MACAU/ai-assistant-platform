@@ -12,12 +12,30 @@ import os
 import time
 from dotenv import load_dotenv
 
-load_dotenv()  # 从 .env 读取环境变量
+load_dotenv()  # 本地开发：从 .env 读取环境变量
+
+
+def _cfg(name: str, default: str = "") -> str:
+    """
+    读取配置，优先级：环境变量（本地 .env）> st.secrets（Streamlit Cloud 部署）。
+    这样本地用 .env、云端用 Secrets，同一份代码两处都能跑。
+    """
+    val = os.getenv(name, "").strip()
+    if val:
+        return val
+    try:
+        import streamlit as st
+        if name in st.secrets:
+            return str(st.secrets[name]).strip()
+    except Exception:
+        pass
+    return default
+
 
 # 读取配置
-BASE_URL = os.getenv("ANTHROPIC_BASE_URL", "").strip()
-AUTH_TOKEN = os.getenv("ANTHROPIC_AUTH_TOKEN", "").strip()
-MODEL = os.getenv("LLM_MODEL", "glm-4.6").strip()
+BASE_URL = _cfg("ANTHROPIC_BASE_URL")
+AUTH_TOKEN = _cfg("ANTHROPIC_AUTH_TOKEN")
+MODEL = _cfg("LLM_MODEL", "glm-4.6")
 
 # 判断是否具备真实调用的条件
 _REAL_READY = bool(BASE_URL and AUTH_TOKEN and "填入" not in AUTH_TOKEN)
