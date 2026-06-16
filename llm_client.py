@@ -106,3 +106,42 @@ def _fake_stream(text: str):
     for i in range(0, len(text), 4):
         yield text[i:i + 4]
         time.sleep(0.012)
+
+
+def _mock_multi(messages) -> str:
+    """多轮对话的模拟返回。"""
+    last_user = ""
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            last_user = m.get("content", "")
+            break
+    preview = last_user.strip().replace("\n", " ")
+    if len(preview) > 60:
+        preview = preview[:60] + "…"
+    return (
+        "【模拟返回 · 占位结果】\n"
+        f"收到你的输入：{preview}\n\n"
+        "这是用于演示流程的占位文本。接入真实模型后，这里会显示 GLM 的实际输出。"
+    )
+
+
+def chat_messages_stream(system: str, messages, temperature: float = 0.7,
+                         max_tokens: int = 1024, force_mock: bool = False):
+    """
+    多轮对话流式接口。messages 为 [{"role": "user"/"assistant", "content": ...}, ...]。
+    用于对话式工具：保留上下文，可追问、可“再来一版”。
+    无法真实调用时回退模拟流。
+    """
+    if force_mock or not _REAL_READY:
+        yield from _fake_stream(_mock_multi(messages))
+        return
+    try:
+        client = _get_client()
+        with client.messages.stream(
+            model=MODEL, max_tokens=max_tokens, temperature=temperature,
+            system=system, messages=messages,
+        ) as stream:
+            for chunk in stream.text_stream:
+                yield chunk
+    except Exception as e:
+        yield from _fake_stream(f"{_mock_multi(messages)}\n\n（真实调用失败，已回退模拟。原因：{e}）")

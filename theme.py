@@ -110,6 +110,25 @@ div[data-testid="stContainer"]:has(>div){border-color:var(--line);}
 
 /* 代码块 */
 .stCodeBlock{border-radius:8px;}
+
+/* 对话气泡：克制留白、细边、用户与助手区分 */
+[data-testid="stChatMessage"]{
+  background:transparent;
+  padding:.4rem .2rem;
+}
+[data-testid="stChatMessageContent"]{
+  border-radius:10px;
+}
+/* 底部对话输入框：聚焦深蓝 */
+[data-testid="stChatInput"] textarea:focus{
+  border-color:var(--navy);
+}
+[data-testid="stChatInput"]{
+  border-color:var(--line);
+}
+/* 示例/快捷按钮：做成轻量胶囊，hover 描深蓝边 */
+.stButton>button{font-size:.9rem;}
+
 </style>
 """
 

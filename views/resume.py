@@ -1,38 +1,28 @@
-"""简历优化"""
-import streamlit as st
-import llm_client
-import prompts
+"""简历优化（对话式）"""
 import ui
+import prompts
 import theme
+import chat_tool
 
 theme.apply()
 force_mock = ui.safety_toggle()
-theme.page_header("简历优化", "输入一段简历内容，得到问题诊断与优化版本")
-
-EXAMPLE = "负责公司微信公众号的日常运营和文章撰写，平时也帮忙做一些活动。"
-if st.button("填入示例"):
-    st.session_state["resume_input"] = EXAMPLE
-
-resume = st.text_area(
-    "粘贴你的简历片段",
-    key="resume_input",
-    placeholder="例如：负责公司微信公众号的日常运营和文章撰写。",
-    height=180,
-)
-
+theme.page_header("简历优化", "输入简历片段，得到诊断与优化，可继续追问改写")
 ui.show_prompt(prompts.RESUME)
 
-if st.button("优化简历", type="primary"):
-    if not resume.strip():
-        st.warning("请先输入简历内容。")
-    else:
-        st.markdown("##### 优化建议")
-        result = st.write_stream(
-            llm_client.chat_stream(prompts.RESUME, resume,
-                                   temperature=0.5, force_mock=force_mock)
-        )
-        ui.status_badge(llm_client.is_real_mode() and not force_mock)
-        st.download_button("下载结果", result, file_name="简历优化.txt")
-        ui.push_history("resume", resume, result)
-
-ui.show_history("resume")
+chat_tool.render(
+    "resume",
+    prompts.RESUME,
+    examples=[
+        "负责公司微信公众号的日常运营和文章撰写。",
+        "做过几个前端项目，用 React。",
+        "在校期间参加过创业比赛拿了奖。",
+    ],
+    quick_actions=[
+        ("量化成果", "把上面的优化结果再补充一些可量化的成果表达"),
+        ("更精简", "把上面的优化结果压缩成一两句话"),
+        ("换个角度", "从另一个角度再优化一版上面的内容"),
+    ],
+    input_placeholder="粘贴你的简历片段…",
+    temperature=0.5,
+    force_mock=force_mock,
+)

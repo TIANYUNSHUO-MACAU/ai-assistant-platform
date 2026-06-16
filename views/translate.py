@@ -1,38 +1,28 @@
-"""翻译助手"""
-import streamlit as st
-import llm_client
-import prompts
+"""翻译助手（对话式）"""
 import ui
+import prompts
 import theme
+import chat_tool
 
 theme.apply()
 force_mock = ui.safety_toggle()
-theme.page_header("翻译助手", "中英互译，自动判断翻译方向")
-
-EXAMPLE = "人工智能正在深刻地改变我们的工作和生活方式。"
-if st.button("填入示例"):
-    st.session_state["trans_input"] = EXAMPLE
-
-text = st.text_area(
-    "输入要翻译的文字（中文或英文）",
-    key="trans_input",
-    placeholder="例如：人工智能正在改变世界。",
-    height=140,
-)
-
+theme.page_header("翻译助手", "中英互译，自动判断方向，可继续要求润色或调整语气")
 ui.show_prompt(prompts.TRANSLATE)
 
-if st.button("翻译", type="primary"):
-    if not text.strip():
-        st.warning("请先输入要翻译的文字。")
-    else:
-        st.markdown("##### 译文")
-        result = st.write_stream(
-            llm_client.chat_stream(prompts.TRANSLATE, text,
-                                   temperature=0.3, force_mock=force_mock)
-        )
-        ui.status_badge(llm_client.is_real_mode() and not force_mock)
-        st.download_button("下载译文", result, file_name="译文.txt")
-        ui.push_history("trans", text, result)
-
-ui.show_history("trans")
+chat_tool.render(
+    "translate",
+    prompts.TRANSLATE,
+    examples=[
+        "人工智能正在改变世界。",
+        "The early bird catches the worm.",
+        "请把这句翻得更口语：我们尽快给您答复。",
+    ],
+    quick_actions=[
+        ("更口语", "把上面的译文改得更口语、更自然一些"),
+        ("更正式", "把上面的译文改得更正式书面一些"),
+        ("解释难点", "解释上面译文里的用词或语法难点"),
+    ],
+    input_placeholder="输入要翻译的中文或英文…",
+    temperature=0.3,
+    force_mock=force_mock,
+)

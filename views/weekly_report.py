@@ -1,44 +1,32 @@
-"""周报生成器"""
-import streamlit as st
-import llm_client
-import prompts
+"""周报生成器（对话式）"""
 import ui
+import prompts
 import theme
+import chat_tool
 
 theme.apply()
 force_mock = ui.safety_toggle()
-theme.page_header("周报生成器", "把零散的工作记录，整理成条理清晰的周报")
-
-EXAMPLE = (
-    "周一装环境，建了仓库\n"
-    "周二和组里讨论框架，选了 Streamlit\n"
-    "做了翻译和文案两个工具\n"
-    "周四合并到主页面，写了 README\n"
-    "还差测试清单没写完"
-)
-if st.button("填入示例"):
-    st.session_state["weekly_input"] = EXAMPLE
-
-raw = st.text_area(
-    "把这周做的事一条条写下来（随便写，不用工整）",
-    key="weekly_input",
-    placeholder="例如：\n周一装环境\n周二选框架\n做了翻译工具…",
-    height=200,
-)
-
+theme.page_header("周报生成器", "把零散记录整理成周报，可继续要求调整详略")
 ui.show_prompt(prompts.WEEKLY_REPORT)
 
-if st.button("生成周报", type="primary"):
-    if not raw.strip():
-        st.warning("请先写几条本周做的事。")
-    else:
-        st.markdown("##### 周报")
-        result = st.write_stream(
-            llm_client.chat_stream(prompts.WEEKLY_REPORT, raw,
-                                   temperature=0.5, force_mock=force_mock)
-        )
-        ui.status_badge(llm_client.is_real_mode() and not force_mock)
-        st.download_button("下载周报", result, file_name="周报.txt")
-        ui.push_history("weekly", raw, result)
+EXAMPLE = (
+    "周一装环境建仓库；周二讨论选了 Streamlit；"
+    "做了翻译和文案两个工具；周四合并写 README；测试清单还没写完"
+)
 
-ui.show_history("weekly")
+chat_tool.render(
+    "weekly",
+    prompts.WEEKLY_REPORT,
+    examples=[
+        EXAMPLE,
+        "改了三个 bug，开了两个会，帮同事看了代码",
+    ],
+    quick_actions=[
+        ("更简短", "把上面的周报压缩得更简短"),
+        ("更详细", "把上面的周报每条展开说明得更详细"),
+        ("加下周计划", "基于上面内容，补充一段更具体的下周计划"),
+    ],
+    input_placeholder="把这周做的事一条条写下来…",
+    temperature=0.5,
+    force_mock=force_mock,
+)
