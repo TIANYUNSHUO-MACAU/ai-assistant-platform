@@ -1,19 +1,22 @@
 # 多功能智能助手平台
 
 > 一个网页入口，集成 6 个 AI 小工具的对话式助手平台。
-> 零基础项目实训作品（6/1 – 6/5）· 框架 **Streamlit** · 模型 **智谱 GLM**
+> 零基础项目实训作品（6/1 – 6/5）· 框架 **Streamlit** · 多模型 BYOK
 
 一个把"输入→输出"的工具，做成**对话式 + 结果可操作**体验的 AI 工具集：
 每个工具都能连续追问、一键调整语气、重新生成、下载结果；PDF 工具支持
-**带页码引用的问答**与**结构化抽取**。无 API key 也能完整演示（双模式兜底）。
+**带页码引用的问答**与**结构化抽取**。支持 6 家模型提供商，自带 Key 即用；
+无 Key 也能完整演示（模拟返回兜底）。
 
 ---
 
 ## 亮点
 
+- **多模型 BYOK**：支持 OpenAI / Claude / 智谱GLM / DeepSeek / 千问 / Kimi，
+  用户在「模型设置」填入自己的 API Key，Key 仅存于当前会话、不入库不外发
 - **对话式交互**：每个工具都是多轮对话，可基于上一轮继续改，不是一次性表单
 - **结果可操作**：重新生成 / 下载 / 复制 / 快捷追问（更正式、更简短、换语气…）
-- **双模式兜底**：未配 key 或 API 不通时自动回退「模拟返回」，**演示永不崩**
+- **模拟兜底**：未填 Key 或 API 不通时自动回退「模拟返回」，**演示永不崩**
 - **演示安全模式**：一键强制走模拟，瞬间出结果、零网络风险，适合彩排与验收
 - **PDF 做深**：按页标记 → 回答带「（见第 3 页）」页码引用 + 一键抽取成表格
 - **纯本地工具**：CSV 预览完全离线运行，断网也能演示
@@ -47,24 +50,22 @@
 # 1. 安装依赖
 pip install -r requirements.txt
 
-# 2.（可选）配置 API key —— 不配也能跑，自动走模拟返回
-cp .env.example .env        # 然后编辑 .env 填入你的智谱 key
-
-# 3. 启动
+# 2. 启动
 streamlit run app.py
 ```
 
 浏览器自动打开 `http://localhost:8501`，左侧边栏切换工具。
 
-`.env` 内容：
+### 配置模型（BYOK，自带密钥）
 
-```
-ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
-ANTHROPIC_AUTH_TOKEN=你的智谱key
-LLM_MODEL=glm-4.6
-```
+进入左侧「**模型设置**」页：
 
-> 使用智谱 GLM 的 Anthropic 兼容端点。`.env` 已被 `.gitignore` 忽略，不会进仓库。
+1. 选择提供商（OpenAI / Claude / 智谱GLM / DeepSeek / 千问 / Kimi）
+2. 填入你自己的 API Key
+3. 选择或手填模型 ID
+
+> Key 只保存在当前浏览器会话中，**刷新或关闭即清除，不写入服务器或仓库**。
+> 不填 Key 也能用——所有工具走「模拟返回」，流程可完整演示。
 
 ## 架构
 
@@ -99,12 +100,12 @@ LLM_MODEL=glm-4.6
 .
 ├── app.py              # 应用入口（st.navigation + 单色线性图标）
 ├── theme.py            # 全局深蓝商务主题（注入 CSS）
-├── llm_client.py       # LLM 客户端（双模式 + 单轮/多轮流式）
+├── llm_client.py       # LLM 客户端（多提供商 BYOK + 单轮/多轮流式）
 ├── chat_tool.py        # 对话式工具复用组件
 ├── ui.py               # 共用组件（安全模式开关 / 提示词查看）
 ├── prompts.py          # 提示词集合（可复用）
 ├── pdf_utils.py        # PDF 分页抽取与页码标记（纯逻辑，可测试）
-├── views/              # 各页面（home / about / 6 个工具）
+├── views/              # 各页面（home / settings / about / 6 个工具）
 ├── tests/              # pytest 单元测试（15 个用例）
 ├── .streamlit/config.toml
 ├── requirements.txt

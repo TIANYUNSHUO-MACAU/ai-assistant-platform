@@ -17,6 +17,7 @@ st.set_page_config(
 pages = {
     "概览": [
         st.Page("views/home.py", title="首页", icon=":material/home:", default=True),
+        st.Page("views/settings.py", title="模型设置", icon=":material/key:"),
         st.Page("views/about.py", title="项目说明", icon=":material/description:"),
     ],
     "AI 工具": [

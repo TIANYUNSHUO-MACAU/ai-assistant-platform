@@ -48,3 +48,25 @@ def test_long_input_is_truncated_in_preview():
     long_text = "字" * 200
     text, _ = llm_client.chat("系统", long_text, force_mock=True)
     assert "…" in text
+
+
+def test_providers_table_complete():
+    """6 个提供商都在，且每个都有必要字段。"""
+    expected = {"OpenAI", "Claude", "智谱 GLM", "DeepSeek", "千问 Qwen", "Kimi"}
+    assert expected.issubset(set(llm_client.PROVIDERS.keys()))
+    for name, cfg in llm_client.PROVIDERS.items():
+        assert cfg["sdk"] in ("openai", "anthropic")
+        assert cfg["models"], f"{name} 缺少预置模型"
+        assert cfg["key_url"].startswith("http")
+
+
+def test_no_key_means_not_real_mode():
+    """没填 key 时不是真实模式（不会消耗任何额度）。"""
+    # pytest 环境下 session_state 不可用，get_key() 返回空
+    assert llm_client.is_real_mode() is False
+
+
+def test_claude_uses_anthropic_sdk():
+    """Claude 走 anthropic SDK，其余走 openai 兼容。"""
+    assert llm_client.PROVIDERS["Claude"]["sdk"] == "anthropic"
+    assert llm_client.PROVIDERS["DeepSeek"]["sdk"] == "openai"

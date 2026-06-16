@@ -20,9 +20,9 @@ def safety_toggle() -> bool:
         if force:
             st.caption("当前：模拟返回（安全）")
         elif llm_client.is_real_mode():
-            st.caption(f"当前：真实模型 {llm_client.current_model()}")
+            st.caption(f"当前：{llm_client.get_provider()} · {llm_client.current_model()}")
         else:
-            st.caption("当前：模拟返回（未配置 key）")
+            st.caption("当前：模拟返回（未配置 Key，去「模型设置」填入）")
     return force
 
 

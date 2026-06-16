@@ -10,9 +10,9 @@ st.caption("零基础项目实训 · Streamlit Demo · 6/1 – 6/5")
 
 # 顶部状态：低调一行，不用彩色大色块
 if llm_client.is_real_mode():
-    st.caption(f"已接入真实模型 {llm_client.current_model()} · 侧边栏可切换演示安全模式")
+    st.caption(f"已接入 {llm_client.get_provider()} · {llm_client.current_model()} · 侧边栏可切换演示安全模式")
 else:
-    st.caption("当前为模拟返回模式（未配置 key），流程可完整演示")
+    st.caption("未配置 API Key，当前为模拟返回模式 · 在左侧「模型设置」选择提供商并填入自己的 Key 即可使用真实模型")
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
