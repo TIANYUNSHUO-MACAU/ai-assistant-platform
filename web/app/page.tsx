@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useChat } from "ai/react";
 import * as Icons from "lucide-react";
 import { MODES, getMode } from "@/lib/modes";
+import { PROVIDERS } from "@/lib/providers";
 import { useSettings } from "@/lib/useSettings";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { MessageBubble } from "@/components/MessageBubble";
@@ -16,16 +17,15 @@ export default function Home() {
   const mode = getMode(modeId);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } =
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput, error } =
     useChat({
       api: "/api/chat",
       body: {
         system: mode.system,
         providerId: settings.providerId,
-        model: settings.model,
+        model: settings.model || PROVIDERS[settings.providerId]?.models[0] || "",
         apiKey: currentKey,
       },
-      onError: () => {},
     });
 
   useEffect(() => {
@@ -96,6 +96,16 @@ export default function Home() {
                   streaming={isLoading && i === messages.length - 1 && m.role === "assistant"}
                 />
               ))
+            )}
+            {error && (
+              <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="font-medium mb-1">⚠ 调用出错</div>
+                <div className="break-words">{error.message}</div>
+                <div className="mt-1.5 text-red-600/80 text-xs">
+                  常见原因：API Key 无效或额度不足、模型名不对、网络/端点不通。
+                  可在「设置」检查 Key 和模型；智谱端点偶发 503，可重试。
+                </div>
+              </div>
             )}
           </div>
         </div>
