@@ -8,6 +8,7 @@ export type Mode = {
   placeholder: string;
   system: string;
   examples: string[];
+  kind?: "chat" | "pdf" | "csv";  // 特殊工具类型
 };
 
 export const MODES: Mode[] = [
@@ -54,6 +55,27 @@ export const MODES: Mode[] = [
     system:
       "你是职场助手。把用户给的零散事项整理成周报，分「本周完成/进行中/下周计划」三部分，每条动词开头，不编造数据。",
     examples: ["周一装环境建仓库；周二选了框架；做了两个工具；周四写文档"],
+  },
+  {
+    id: "pdf",
+    label: "与 PDF 对话",
+    icon: "FileText",
+    kind: "pdf",
+    placeholder: "针对 PDF 内容提问…",
+    system:
+      "你是文档问答助手。基于用户提供的 PDF 分页内容回答问题，引用信息时标注页码，如「（见第 3 页）」。" +
+      "若答案不在文档中，明确说明未找到，不要编造。",
+    examples: ["这份文档讲了什么？", "总结主要结论", "提取关键数据"],
+  },
+  {
+    id: "csv",
+    label: "CSV 预览",
+    icon: "Table",
+    kind: "csv",
+    placeholder: "上传 CSV 后可在下方提问（可选）…",
+    system:
+      "你是数据分析助手。基于用户提供的 CSV 表格内容回答问题，给出简洁、有依据的分析。",
+    examples: ["这个表格有哪些列？", "数据有什么规律？"],
   },
 ];
 
