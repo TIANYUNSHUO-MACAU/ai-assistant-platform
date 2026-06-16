@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Claude 桌面版风格：暖白底、墨黑字、克制的赤陶点缀 */
+  --bg: #F5F4EF;
+  --surface: #FFFFFF;
+  --border: #E5E2DA;
+  --ink: #1F1E1C;
+  --muted: #6B6862;
+  --accent: #C15F3C;       /* Claude 标志性的赤陶橙 */
+  --accent-fg: #FFFFFF;
+}
+
+.dark {
+  --bg: #1F1E1C;
+  --surface: #2A2826;
+  --border: #3A3733;
+  --ink: #F2F0EA;
+  --muted: #A6A199;
+  --accent: #D97757;
+  --accent-fg: #1F1E1C;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 滚动条精致化 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* Markdown 排版 */
+.prose-chat { line-height: 1.7; }
+.prose-chat p { margin: 0.5rem 0; }
+.prose-chat ul, .prose-chat ol { margin: 0.5rem 0; padding-left: 1.4rem; }
+.prose-chat li { margin: 0.2rem 0; }
+.prose-chat h1, .prose-chat h2, .prose-chat h3 { font-weight: 600; margin: 0.8rem 0 0.4rem; }
+.prose-chat code {
+  background: var(--bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+.prose-chat pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem;
+  overflow-x: auto;
+  margin: 0.6rem 0;
+}
+.prose-chat pre code { background: transparent; padding: 0; }
+.prose-chat table { border-collapse: collapse; margin: 0.6rem 0; width: 100%; }
+.prose-chat th, .prose-chat td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.7rem;
+  text-align: left;
+}
+
+/* 流式光标 */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.cursor-blink::after {
+  content: '▋';
+  animation: blink 1s step-start infinite;
+  color: var(--accent);
+  margin-left: 1px;
+}
