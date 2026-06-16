@@ -1,7 +1,6 @@
 """
-页面共用的 UI 小工具，避免每个工具页重复写。
-包含：演示安全模式开关、真实/模拟状态徽章、提示词查看框、会话历史记录。
-风格：去 emoji，中性商务。
+页面共用的 UI 小工具。
+对话式改版后只保留两个仍在使用的组件：演示安全模式开关、提示词查看框。
 """
 
 import streamlit as st
@@ -27,36 +26,7 @@ def safety_toggle() -> bool:
     return force
 
 
-def status_badge(is_real: bool):
-    """在结果上方显示这次输出是真实还是模拟。"""
-    if is_real:
-        st.caption("· 本次为真实模型输出")
-    else:
-        st.caption("· 本次为模拟返回（演示占位）")
-
-
 def show_prompt(system_prompt: str):
     """可展开查看当前工具使用的系统提示词（验收加分项：提示词可见）。"""
     with st.expander("查看本工具使用的提示词"):
         st.code(system_prompt, language="text")
-
-
-def push_history(tool: str, user_input: str, output: str):
-    """记录一次会话到 session_state。"""
-    key = f"history_{tool}"
-    st.session_state.setdefault(key, [])
-    st.session_state[key].insert(0, {"input": user_input, "output": output})
-    st.session_state[key] = st.session_state[key][:10]  # 最多留 10 条
-
-
-def show_history(tool: str):
-    """展示该工具的历史记录，可往回翻。"""
-    key = f"history_{tool}"
-    records = st.session_state.get(key, [])
-    if not records:
-        return
-    with st.expander(f"本次会话历史（{len(records)} 条）"):
-        for i, r in enumerate(records, 1):
-            st.markdown(f"**#{i} 输入**：{r['input'][:60]}")
-            st.markdown(f"**输出**：{r['output'][:200]}")
-            st.divider()

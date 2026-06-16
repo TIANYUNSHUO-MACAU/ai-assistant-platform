@@ -9,6 +9,21 @@
 import streamlit as st
 import llm_client
 
+# 发送给模型的最大历史轮数（控制成本与上下文长度）
+MAX_TURNS = 12
+
+
+def trim_history(msgs, max_turns=MAX_TURNS):
+    """
+    截断历史用于发送给模型：只取最近 max_turns 条，
+    并保证首条为 user（Anthropic 要求），否则从头去掉 assistant。
+    返回新的消息列表（不修改入参）。
+    """
+    recent = msgs[-max_turns:]
+    while recent and recent[0]["role"] != "user":
+        recent = recent[1:]
+    return [{"role": m["role"], "content": m["content"]} for m in recent]
+
 
 def _msgs_key(tool: str) -> str:
     return f"chat_{tool}"
@@ -52,7 +67,7 @@ def render(tool: str, system: str, *, examples=None, quick_actions=None,
     # —— 如果最后一条是用户消息且没有回复，生成回复（流式）——
     if msgs and msgs[-1]["role"] == "user":
         with st.chat_message("assistant"):
-            api_msgs = [{"role": m["role"], "content": m["content"]} for m in msgs]
+            api_msgs = trim_history(msgs)
             reply = st.write_stream(
                 llm_client.chat_messages_stream(
                     full_system, api_msgs, temperature=temperature, force_mock=force_mock
